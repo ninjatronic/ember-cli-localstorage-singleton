@@ -12,8 +12,6 @@ ember install:addon localstorage-singleton
 
 Use this extension to create persistent singletons for your Ember CLI apps.
 
-**app/singletons/settings**
-
 ```coffeescript
 `import Ember from 'ember'`
 `import LocalStorageSingleton from 'localstorage-singleton/lib/localstorage-singleton'`
@@ -21,9 +19,11 @@ Use this extension to create persistent singletons for your Ember CLI apps.
 
 Settings = LocalStorageSingleton.extend Ember.Evented
 
+  # optional
   becameError: ->
     @trigger 'becameError'
 
+  # optional 
   didSave: ->
     @trigger 'didSave'
 
@@ -33,8 +33,30 @@ Settings.reopenClass
 
 
 `export default Settings`
-
 ```
+
+### General Usage
+
+**app/routes/myRoute**
+
+```coffeescript
+`import Ember from 'ember'`
+`import Settings from 'app/singletons/settings'`
+
+
+MyRoute = Ember.Route.extend
+
+  model: ->
+    Settings.create
+      lastAccess: new Date().toString()
+
+
+`export default MyController`
+```
+
+### Usage in an Initializer
+
+**app/singletons/settings**
 
 **app/initializers/settings**
 
@@ -70,5 +92,4 @@ MyController = Ember.Controller.extend
 
 
 `export default MyController`
-
 ```
