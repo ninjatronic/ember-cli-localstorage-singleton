@@ -56,8 +56,6 @@ MyRoute = Ember.Route.extend
 
 ### Usage in an Initializer
 
-**app/singletons/settings**
-
 **app/initializers/settings**
 
 ```coffeescript
