@@ -1,32 +1,71 @@
 `import Ember from 'ember'`
-`import LocalStorageError from 'localstorage-singleton/lib//localstorage-error'`
+
 
 LocalStorageSingleton = Ember.Object.extend
 
-  _key: Ember.computed ->
+  # the key to use in localStorage - statically defined on type
+  _storageKey: Ember.computed ->
     @constructor.key
 
-  _serialize: (target) ->
 
-  _persist: ->
-    localStorage.setItem @get('_key'), @_serialize this
+  #
+  # SERIALIZATION
+  #
 
-  create: (arguments) ->
-    @_super arguments
-    @_persist()
+  _serialize: (deserialized) ->
+    JSON.stringify deserialized
+
+  _deserialize: (serialized) ->
+    if serialized? then JSON.parse serialized else null
+
+
+  #
+  # MECHANISM
+  #
+  # the core functionality of localstorage-singleton: a singleton object is a
+  # proxy for a JSON structure in a HTML5 localStorage key
+  #
 
   unknownProperty: (key) ->
-    instance = JSON.parse localStorage.getItem @get '_key'
+    storageKey = @get '_storageKey'
+
+    instance = @_deserialize localStorage.getItem storageKey
+    instance ?= {}
+
     return instance[key]
 
   setUnknownProperty: (key, value) ->
-    instance = JSON.parse localStorage.getItem @get '_key'
+    @propertyWillChange key
+
+    storageKey = @get '_storageKey'
+
+    instance = JSON.parse localStorage.getItem storageKey
+    instance ?= {}
+
     instance[key] = value
 
+    @set 'isSaving', true
     try
-      localStorage.setItem @get '_key', instance
-    catch e
-      throw new LocalStorageError e
+      localStorage.setItem storageKey, @_serialize instance
+      @set 'isError', false
+      @didSave?()
+    catch
+      @set 'isError', true
+      @becameError?()
+    finally
+      @set 'isSaving', false
+      @propertyDidChange key
+
+
+  #
+  # PUBLIC API
+  #
+
+  # true iff the object is currently saving
+  isSaving: false
+
+  # true iff the last attempt to save the object caused an error
+  isError: false
 
 
 `export default LocalStorageSingleton`
