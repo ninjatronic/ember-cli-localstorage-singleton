@@ -39,7 +39,7 @@ LocalStorageSingleton = Ember.Object.extend
 
     storageKey = @get '_storageKey'
 
-    instance = JSON.parse localStorage.getItem storageKey
+    instance = @_deserialize localStorage.getItem storageKey
     instance ?= {}
 
     instance[key] = value
