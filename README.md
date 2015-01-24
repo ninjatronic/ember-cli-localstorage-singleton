@@ -12,12 +12,16 @@ ember install:addon localstorage-singleton
 
 Use this extension to create persistent singletons for your Ember CLI apps.
 
+**app/singletons/settings**
+
 ```coffeescript
 `import Ember from 'ember'`
 `import LocalStorageSingleton from 'localstorage-singleton/lib/localstorage-singleton'`
 
 
-Settings = LocalStorageSingleton.extend Ember.Evented
+Settings = LocalStorageSingleton.extend Ember.Evented,
+
+  # You don't have to mix in Ember.Evented, this is just a serving suggestion
 
   # optional
   becameError: ->
